@@ -12,8 +12,13 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumnModel;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -22,6 +27,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class EtudiantTable extends JFrame {
 
@@ -31,8 +37,73 @@ public class EtudiantTable extends JFrame {
     public EtudiantTable() {
         // Configuration de la fenêtre
         setTitle("Table des Etudiants");
-        setSize(1100, 600);
+        setSize(1000, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(true);
+        setUndecorated(true);
+
+        JPanel panelBody = new JPanel();
+        panelBody.setLayout(null);
+        panelBody.setBackground(new Color(2, 2, 17, 245));
+        panelBody.setBounds(0, 0, 1000, 650);
+        add(panelBody);
+
+        JButton fermerButon = new JButton("X");
+        fermerButon.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        fermerButon.setContentAreaFilled(true);
+        fermerButon.setFocusPainted(false);
+        fermerButon.setBorderPainted(false);
+        fermerButon.setForeground(Color.white);
+        fermerButon.setBackground(new Color(2, 2, 17, 255));
+        fermerButon.addActionListener(e -> System.exit(0));
+        fermerButon.setBounds(935, 3, 50, 20);
+        fermerButon.setFont(new Font("Serif", Font.PLAIN, 18));
+        panelBody.add(fermerButon);
+        fermerButon.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                fermerButon.setBackground(new Color(183, 47, 36, 247));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                fermerButon.setForeground(Color.white);
+                fermerButon.setBackground(new Color(2, 2, 17, 255));
+
+            }
+        });
+        JButton reduireButon = new JButton("-");
+        reduireButon.setFocusPainted(false);
+        reduireButon.setBorderPainted(false);
+        reduireButon.setForeground(Color.white);
+        reduireButon.setBackground(new Color(2, 2, 17, 255));
+        reduireButon.addActionListener(e -> setState(Frame.ICONIFIED));
+        reduireButon.setBounds(935, 35, 50, 20);
+        reduireButon.setFont(new Font("Serif", Font.PLAIN, 40));
+        panelBody.add(reduireButon);
+
+        reduireButon.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                reduireButon.setBackground(new Color(255, 144, 33, 255));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                reduireButon.setForeground(Color.white);
+                reduireButon.setBackground(new Color(2, 2, 17, 255));
+            }
+        });
+
+        //add image logo
+        ImageIcon imageIcon = new ImageIcon(Objects.requireNonNull(EtudiantTable.class.getResource("/digitalisation-removebg-preview.png")));
+        Image image = imageIcon.getImage();
+        Image scaledImage = image.getScaledInstance(115, 70, Image.SCALE_SMOOTH);
+        ImageIcon scaledIcon = new ImageIcon(scaledImage);
+        JLabel imageLabel = new JLabel(scaledIcon);
+        imageLabel.setBounds(0, 3, 115, 70);
+        panelBody.add(imageLabel);
+
 
         // Création du modèle de table
         model = new DefaultTableModel();
@@ -56,12 +127,50 @@ public class EtudiantTable extends JFrame {
 
         // Créer la table avec le modèle
         table = new JTable(model);
+        table.setForeground(Color.white);
+        table.setFont(new Font("Serif", Font.BOLD, 14));
+        table.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        table.setSelectionBackground(new Color(255, 253, 251, 224));
+        table.setSelectionForeground(new Color(2, 2, 17, 255));
+        table.setBackground(new Color(2, 2, 17, 255));
+
+        // Center align text in all columns
+        DefaultTableCellRenderer centerRendererStudent = new DefaultTableCellRenderer();
+        centerRendererStudent.setHorizontalAlignment(SwingConstants.CENTER);
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            table.getColumnModel().getColumn(i).setCellRenderer(centerRendererStudent);
+        }
+        table.setRowHeight(40);
+
+        TableColumnModel columnModelStudent = table.getColumnModel();
+        for (int i = 0; i < columnModelStudent.getColumnCount(); i++) {
+            columnModelStudent.getColumn(i).setPreferredWidth(150);
+        }
+
         JScrollPane scrollPane = new JScrollPane(table);
-        add(scrollPane, BorderLayout.CENTER);
+        scrollPane.setBounds(10, 80, 975, 560);
+        scrollPane.setBackground(new Color(2, 2, 17, 255));
+        scrollPane.setBorder(BorderFactory.createLineBorder(Color.white));
+        scrollPane.getViewport().setOpaque(false);
+
+        JTableHeader header = table.getTableHeader();
+        header.setBackground(Color.WHITE);
+        header.setFont(new Font("Serif", Font.BOLD, 15));
+        header.setForeground(new Color(2, 2, 17, 255));
+
+        table.setForeground(Color.white);
+        table.setFont(new Font("Serif", Font.BOLD, 12));
+        table.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        table.setSelectionBackground(new Color(255, 253, 251, 224));
+        table.setSelectionForeground(new Color(2, 2, 17, 255));
+        panelBody.add(scrollPane);
+
 
         // Ajout des boutons pour les actions
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(1, 5));  // Ajout d'une colonne supplémentaire
+        panel.setBackground(new Color(2, 2, 17, 245));
 
         JButton updateButton = new JButton("Mettre à jour");
         updateButton.addActionListener(e -> updateMoyenne());
@@ -91,10 +200,10 @@ public class EtudiantTable extends JFrame {
         setVisible(true);
     }
 
-    public static void main(String[] args) {
-        // Lancer l'application
-        SwingUtilities.invokeLater(() -> new EtudiantTable());
-    }
+//    public static void main(String[] args) {
+//        // Lancer l'application
+//        SwingUtilities.invokeLater(() -> new EtudiantTable());
+//    }
 
     // Méthode pour récupérer les étudiants via une requête HTTP GET
     private List<Etudiant> getAllEtudiants() {
@@ -140,7 +249,7 @@ public class EtudiantTable extends JFrame {
     }
 
     // Fonction pour actualiser la table avec les dernières données
-    private void refreshTable() {
+    public void refreshTable() {
         // Supprimer toutes les lignes existantes dans le tableau
         model.setRowCount(0);
 
@@ -315,9 +424,6 @@ public class EtudiantTable extends JFrame {
     }
 
 
-
-
-
     // Fonction pour ajouter un nouvel étudiant
     private void addEtudiant() {
         // Affichage d'un formulaire pour l'ajout d'un étudiant
@@ -342,6 +448,8 @@ public class EtudiantTable extends JFrame {
 
                 addEtudiantToAPI(newEtudiant);
                 refreshTable(); // Actualiser la table pour afficher le nouvel étudiant
+                JOptionPane.showMessageDialog(this, "Success.");
+
             } catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(this, "Veuillez entrer une moyenne valide.");
             }
