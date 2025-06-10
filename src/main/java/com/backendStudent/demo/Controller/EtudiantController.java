@@ -34,6 +34,11 @@ public class EtudiantController {
         return etudiantService.getStats();
     }
 
+    @GetMapping("/classe/{classe}")
+    public List<Etudiant> getEtudiantsByClasse(@PathVariable String classe) {
+        return etudiantService.getEtudiantsByClasse(classe);
+    }
+
 
     @PostMapping
     public Etudiant addEtudiant(@RequestBody Etudiant etudiant) {
@@ -50,6 +55,16 @@ public class EtudiantController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
+
+    @PutMapping("/{id}/identite")
+    public Etudiant updateNomPrenom(
+            @PathVariable Long id,
+            @RequestParam String nom,
+            @RequestParam String prenom
+    ) {
+        return etudiantService.updateNomPrenom(id, nom, prenom);
+    }
+
 
 
     @DeleteMapping("/{id}")

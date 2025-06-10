@@ -21,6 +21,11 @@ public class EtudiantService {
         return etudiantRepository.findAll();
     }
 
+    public List<Etudiant> getEtudiantsByClasse(String classe) {
+        return etudiantRepository.findByClasse(classe);
+    }
+
+
     public Etudiant addEtudiant(Etudiant etudiant) {
         etudiant.definirStatut();
         return etudiantRepository.save(etudiant);
@@ -38,6 +43,18 @@ public class EtudiantService {
             throw new RuntimeException("Étudiant non trouvé avec l'ID : " + id);
         }
     }
+    public Etudiant updateNomPrenom(Long id, String nouveauNom, String nouveauPrenom) {
+        Optional<Etudiant> optionalEtudiant = etudiantRepository.findById(id);
+        if (optionalEtudiant.isPresent()) {
+            Etudiant etudiant = optionalEtudiant.get();
+            etudiant.setNom(nouveauNom);
+            etudiant.setPrenom(nouveauPrenom);
+            return etudiantRepository.save(etudiant);
+        } else {
+            throw new RuntimeException("Étudiant non trouvé avec l'ID : " + id);
+        }
+    }
+
 
     public void deleteEtudiant(Long id) {
         etudiantRepository.deleteById(id);

@@ -11,7 +11,8 @@ import javax.swing.*;
 public class DemoApplication {
 
     public static void main(String[] args) {
-        EtudiantTable fr = new EtudiantTable();
+
+        FrontOffice fr = new FrontOffice();
         fr.setVisible(true);
         ConfigurableApplicationContext run = SpringApplication.run(DemoApplication.class, args);
         if (run.isRunning()) {
