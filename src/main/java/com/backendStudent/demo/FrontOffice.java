@@ -247,8 +247,6 @@ public class FrontOffice extends JFrame {
         panelStatistiques.setVisible(false);
 
 
-
-
 //        ChartPanel chartPanel = new ChartPanel(chart);
 //        chartPanel.setPreferredSize(new java.awt.Dimension(800, 600));
 //        JFrame chartFrame = new JFrame("Graphique des Statistiques");
@@ -256,7 +254,6 @@ public class FrontOffice extends JFrame {
 //        chartFrame.getContentPane().add(chartPanel, BorderLayout.CENTER);
 //        chartFrame.pack();
 //        chartFrame.setVisible(true);
-
 
 
         //student register form
@@ -435,7 +432,10 @@ public class FrontOffice extends JFrame {
                 search.setBackground(new Color(2, 2, 17, 251));
                 search.setForeground(Color.white);
                 System.out.println("io " + getAllEtudiants().get(0).getNom());
+
+
             }
+
 
             @Override
             public void mouseExited(MouseEvent e) {
@@ -444,6 +444,19 @@ public class FrontOffice extends JFrame {
 
             }
         });
+
+        search.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if ((comboBoxItemsClass.getSelectedItem().equals(comboBoxItemsClass.getItemAt(0)))) {
+                    updateTableStudent(getAllEtudiants());
+                } else {
+                    updateTableStudent(getAllEtudiantsParClasse((String) comboBoxItemsClass.getSelectedItem()));
+
+                }
+
+            }
+        });
+
 
         JButton refresh = new JButton("🔃");
         refresh.setBackground(Color.WHITE);
@@ -568,15 +581,15 @@ public class FrontOffice extends JFrame {
         refresh.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                List<Etudiant> updatedStudents = getAllEtudiants(); // Récupérer la dernière version
-                updateTableStudent(updatedStudents); // Mettre à jour le tableau
+                List<Etudiant> updatedStudents = getAllEtudiants();
+                updateTableStudent(updatedStudents);
                 System.out.println("io");
                 comboBoxItemsClass.setSelectedItem(comboBoxItemsClass.getItemAt(0));
             }
         });
 
 
-//for insert student
+        //for insert student
         insertUser.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -593,7 +606,7 @@ public class FrontOffice extends JFrame {
                     Etudiant newEtudiant = new Etudiant(null, name, firstName, grade, moyenne, null); // Statut est null, il sera défini par la méthode @PrePersist
 
                     addEtudiantToAPI(newEtudiant);
-//                        refreshTable();
+                    refreshTable();
                     JOptionPane.showMessageDialog(panelStudent, "Success.");
                     List<Etudiant> updatedStudents = getAllEtudiants();
                     updateTableStudent(updatedStudents);
@@ -734,6 +747,53 @@ public class FrontOffice extends JFrame {
         try {
             // URL de l'API (assurez-vous que votre API est en cours d'exécution)
             URL url = new URL("http://localhost:8080/etudiants");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(5000);
+
+            // Vérifier la réponse du serveur
+            if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                // Lire la réponse du serveur
+                InputStreamReader in = new InputStreamReader(connection.getInputStream());
+                StringBuilder response = new StringBuilder();
+                int character;
+                while ((character = in.read()) != -1) {
+                    response.append((char) character);
+                }
+
+                // Convertir la réponse JSON en liste d'objets Etudiant
+                JSONArray jsonArray = new JSONArray(response.toString());
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    Long id = jsonObject.getLong("id");
+                    String nom = jsonObject.getString("nom");
+                    String prenom = jsonObject.getString("prenom");
+                    String classe = jsonObject.getString("classe");
+                    double moyenne = jsonObject.getDouble("moyenne");
+                    String statut = jsonObject.getString("statut");  // Vous pouvez ajuster selon vos besoins
+
+                    // Créer un objet Etudiant et l'ajouter à la liste
+                    Etudiant etudiant = new Etudiant(id, nom, prenom, classe, moyenne, StatutEtudiant.valueOf(statut));
+                    etudiants.add(etudiant);
+                }
+            } else {
+                System.out.println("Erreur lors de la récupération des étudiants.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return etudiants;
+    }
+
+
+    private List<Etudiant> getAllEtudiantsParClasse(String grad) {
+        List<Etudiant> etudiants = new ArrayList<>();
+        try {
+            // URL de l'API (assurez-vous que votre API est en cours d'exécution)
+            String encodedClasse = URLEncoder.encode(grad, "UTF-8").replace("+", "%20");
+            URL url = new URL("http://localhost:8080/etudiants/classe/" + encodedClasse);
+            System.out.println("url : " + url);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.setConnectTimeout(5000);
@@ -920,11 +980,5 @@ public class FrontOffice extends JFrame {
         }
     }
 
-
-
-    public static void main(String[] args) {
-        JFrame f = new FrontOffice();
-        f.setVisible(true);
-    }
 
 }

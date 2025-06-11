@@ -20,33 +20,39 @@ public class EtudiantController {
 
 
     @GetMapping
-    public List<Etudiant> getAllEtudiants() {
+    public List<Etudiant> getAllEtudiants()
+    {
         return etudiantService.getAllEtudiants();
     }
 
     @GetMapping("/{id}")
-    public Optional<Etudiant> getEtudiantsById(@PathVariable long id) {
+    public Optional<Etudiant> getEtudiantsById(@PathVariable long id)
+    {
         return etudiantService.getEtudiantById(id);
     }
 
     @GetMapping("/stats")
-    public DoubleSummaryStatistics getStats() {
+    public DoubleSummaryStatistics getStats()
+    {
         return etudiantService.getStats();
     }
 
     @GetMapping("/classe/{classe}")
-    public List<Etudiant> getEtudiantsByClasse(@PathVariable String classe) {
+    public List<Etudiant> getEtudiantsByClasse(@PathVariable String classe)
+    {
         return etudiantService.getEtudiantsByClasse(classe);
     }
 
 
     @PostMapping
-    public Etudiant addEtudiant(@RequestBody Etudiant etudiant) {
+    public Etudiant addEtudiant(@RequestBody Etudiant etudiant)
+    {
         return etudiantService.addEtudiant(etudiant);
     }
 
     @PutMapping("/{id}/moyenne")
-    public ResponseEntity<Etudiant> updateMoyenne(@PathVariable Long id, @RequestBody Map<String, Double> requestBody) {
+    public ResponseEntity<Etudiant> updateMoyenne(@PathVariable Long id, @RequestBody Map<String, Double> requestBody)
+    {
         try {
             double nouvelleMoyenne = requestBody.get("moyenne");
             Etudiant updatedEtudiant = etudiantService.updateMoyenne(id, nouvelleMoyenne);
@@ -66,9 +72,9 @@ public class EtudiantController {
     }
 
 
-
     @DeleteMapping("/{id}")
-    public void deleteEtudiant(@PathVariable Long id) {
+    public void deleteEtudiant(@PathVariable Long id)
+    {
         etudiantService.deleteEtudiant(id);
     }
 }
